@@ -1,6 +1,5 @@
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import ProductContainerHomePage from '../components/ProductContainerHomePage'
 
 const screenWidth = Dimensions.get('window').width;
 const spacing = 10;
@@ -52,15 +51,16 @@ const HomeScreen = () => {
   // Hàm render từng danh mục cùng với sản phẩm thuộc danh mục đó
   const renderCategory = ({ item: category }) => {
     // Lọc sản phẩm theo category_id
-    const filteredProducts = products.filter(product => product.category_category === category.category_id).slice(0, 4);
+    const filteredProducts = products.filter(product => product.product_category === category._id).slice(0, 4);
 
+    console.log("Filtered products:", filteredProducts);
     return (
       <View>
         <Text style={styles.h2}>{category.category_name}</Text>
         <FlatList
           data={filteredProducts}
           renderItem={renderProductItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.category_id ? item.category_id.toString() : 'default_id'}
           numColumns={2}
           contentContainerStyle={styles.list}
           columnWrapperStyle={styles.columnWrapper}
