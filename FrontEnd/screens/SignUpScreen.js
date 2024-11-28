@@ -1,116 +1,150 @@
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-import axios from 'axios';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { registerUser } from '../src/Redux/actions/userActions';
+import { useNavigation } from '@react-navigation/native';
+
+const screenWidth = Dimensions.get('window').height;
+const bannerHeight = screenWidth / 2.5;
 
 const SignUpScreen = () => {
+  const [username, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
-    const [email, setEmail] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-    const handleSignUp = async () => {
-        setLoading(true);
-        setError('');
+  const { loading, error, userInfo } = useSelector((state) => state.user);
 
-        try {
-            const response = await axios.post('http://192.168.100.11:3000/api/users/register', {
-                name,
-                email,
-                phone_number: phoneNumber,
-                password,
-            });
+  const handleRegister = () => {
+    const userData = { username, email, password, phoneNumber };
+    dispatch(registerUser(userData));
+  };
 
-            if (response.data.token) {
-                alert('Đăng ký thành công!');
-                navigation.navigate('Login');  
-            }
-        } catch (err) {
-            setError(err.response ? err.response.data.msg : 'Đã xảy ra lỗi' + err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  if (userInfo) {
+    navigation.navigate('MainTabs');
+  }
 
+  return (
+    <View style={styles.container}>
+      <Image
+        source={{ uri: 'https://res.cloudinary.com/dtgx1dpzb/image/upload/v1731642068/Ellipse_1_i1wg7t.png' }}
+        style={styles.backgroundImage}
+      />
+      <Text style={styles.welcomeText}>Chào mừng bạn</Text>
+      <Text style={styles.loginText}>Đăng ký tài khoản</Text>
 
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={styles.header}>Đăng Ký</Text>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-
-            <TextInput
-                style={styles.input}
-                placeholder="Họ và tên"
-                value={name}
-                onChangeText={setName}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Số điện thoại"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                keyboardType="phone-pad"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Mật khẩu"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
-
-            <Button
-                title={loading ? 'Đang đăng ký...' : 'Đăng ký'}
-                onPress={handleSignUp}
-                disabled={loading}
-            />
-
-            <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
-                Đã có tài khoản? Đăng nhập ngay.
-            </Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Tên"
+          value={username}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Mật khẩu"
+            value={password}
+            secureTextEntry={!showPassword}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Text>{showPassword ? 'Ẩn' : 'Hiện'}</Text>
+          </TouchableOpacity>
         </View>
-    )
-}
+        <TextInput
+          style={styles.input}
+          placeholder="Số điện thoại"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+        />
+      </View>
 
-export default SignUpScreen
+      {loading && <Text>Loading...</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
+        <Text style={styles.loginButtonText}>Đăng ký</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+        <Text style={styles.registerText}>Bạn có tài khoản? Đăng Nhập Ngay</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 12,
-        paddingLeft: 8,
-    },
-    error: {
-        color: 'red',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    link: {
-        textAlign: 'center',
-        color: 'blue',
-        marginTop: 10,
-    },
-})
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: bannerHeight,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 20,
+  },
+  loginText: {
+    fontSize: 16,
+    color: '#777',
+  },
+  inputContainer: {
+    width: '80%',
+    marginTop: 20,
+  },
+  input: {
+    backgroundColor: '#f1f1f1',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  passwordContainer: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f1f1f1',
+    borderRadius: 5,
+    paddingRight: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: '#e74c3c',
+    marginTop: 5,
+  },
+  loginButton: {
+    backgroundColor: '#27ae60',
+    width: '80%',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  registerText: {
+    marginTop: 20,
+    color: '#3498db',
+    fontSize: 14,
+  },
+});

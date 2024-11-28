@@ -14,3 +14,18 @@ const connectDB = () => {
 }
 
 module.exports = { connectDB };
+
+
+
+// // Import dotenv
+// const dotenv = require('dotenv');
+//
+// // Load file .env
+// dotenv.config();
+//
+// // Sử dụng biến môi trường
+// const mongoURI = process.env.MONGO_URI;
+// const port = process.env.PORT || 3000;
+//
+// console.log('Mongo URI:', mongoURI);
+// console.log('App running on port:', port);

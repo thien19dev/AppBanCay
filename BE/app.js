@@ -8,10 +8,13 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var categoryRouter = require('./routes/category');
 var productsRouter = require('./routes/products');
-
+const cartRoutes = require('./routes/cart');
 var app = express();
 const server = require("./server")
 server.connectDB()
+
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +30,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/product', productsRouter);
+// app.use('/api/cart', cartRoutes);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
